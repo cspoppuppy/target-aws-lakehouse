@@ -135,3 +135,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .vscode/
+
+# Singer JSON files
+config*.json
+state.json
+messages*.json

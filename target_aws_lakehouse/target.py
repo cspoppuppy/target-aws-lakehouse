@@ -3,13 +3,13 @@
 from singer_sdk import typing as th
 from singer_sdk.target_base import Target
 
-from target_s3_parquet.sinks import S3ParquetSink
+from target_aws_lakehouse.sinks import S3ParquetSink
 
 
 class TargetS3Parquet(Target):
     """Sample target for S3Parquet."""
 
-    name = "target-s3-parquet"
+    name = "target-aws-lakehouse"
     config_jsonschema = th.PropertiesList(
         th.Property(
             "s3_path",
@@ -26,5 +26,26 @@ class TargetS3Parquet(Target):
         th.Property("athena_database", th.StringType, required=True),
         th.Property("add_record_metadata", th.BooleanType, default=None),
         th.Property("stringify_schema", th.BooleanType, default=None),
+        th.Property(
+            "file_type",
+            th.StringType,
+            description="The type of files to write to S3",
+            default="parquet",
+            allowed_values=["parquet"],
+        ),
+        th.Property(
+            "compression",
+            th.StringType,
+            description="The type of files compression style",
+            default=None,
+            allowed_values=["snappy", "gzip", "zstd"],
+        ),
+        th.Property(
+            "table_type",
+            th.StringType,
+            description="The type of Athena table",
+            default="hive",
+            allowed_values=["hive", "iceberg"],
+        ),
     ).to_dict()
     default_sink_class = S3ParquetSink

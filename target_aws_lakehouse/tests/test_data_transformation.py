@@ -1,5 +1,5 @@
 from sqlalchemy import true
-from target_s3_parquet.sanitizer import (
+from target_aws_lakehouse.sanitizer import (
     get_specific_type_attributes,
     apply_json_dump_to_df,
     get_valid_attributes,

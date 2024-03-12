@@ -1,4 +1,4 @@
-from target_s3_parquet.data_type_generator import (
+from target_aws_lakehouse.data_type_generator import (
     generate_tap_schema,
     generate_current_target_schema,
 )

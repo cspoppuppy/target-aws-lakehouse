@@ -1,6 +1,6 @@
-# target-s3-parquet
+# target-aws-lakehouse
 
-`target-s3-parquet` is a Singer target for S3Parquet.
+`target-aws-lakehouse` is a Singer target for S3Parquet.
 
 Build with the [Meltano Target SDK](https://sdk.meltano.com).
 
@@ -17,17 +17,17 @@ poetry install
 
 ### Create and Run Tests
 
-Create tests within the `target_s3_parquet/tests` subfolder and
+Create tests within the `target_aws_lakehouse/tests` subfolder and
   then run:
 
 ```bash
 poetry run pytest
 ```
 
-You can also test the `target-s3-parquet` CLI interface directly using `poetry run`:
+You can also test the `target-aws-lakehouse` CLI interface directly using `poetry run`:
 
 ```bash
-poetry run target-s3-parquet --help
+poetry run target-aws-lakehouse --help
 ```
 
 ### Testing with [Meltano](https://meltano.com/)
@@ -44,7 +44,7 @@ Next, install Meltano (if you haven't already) and any needed plugins:
 # Install meltano
 pipx install meltano
 # Initialize meltano within this directory
-cd target-s3-parquet
+cd target-aws-lakehouse
 meltano install
 ```
 
@@ -52,9 +52,9 @@ Now you can test and orchestrate using Meltano:
 
 ```bash
 # Test invocation:
-meltano invoke target-s3-parquet --version
+meltano invoke target-aws-lakehouse --version
 # OR run a test `elt` pipeline with the Carbon Intensity sample tap:
-meltano elt tap-carbon-intensity target-s3-parquet
+meltano elt tap-carbon-intensity target-aws-lakehouse
 ```
 
 ### SDK Dev Guide

@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 from singer_sdk.testing import get_standard_target_tests
 
-from target_s3_parquet.target import TargetS3Parquet
+from target_aws_lakehouse.target import TargetS3Parquet
 
 SAMPLE_CONFIG: Dict[str, Any] = {
     # TODO: Initialize minimal target config

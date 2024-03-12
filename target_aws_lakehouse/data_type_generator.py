@@ -1,4 +1,4 @@
-from target_s3_parquet.sanitizer import get_valid_types, type_from_anyof
+from target_aws_lakehouse.sanitizer import get_valid_types, type_from_anyof
 
 
 def build_struct_type(attributes, level):

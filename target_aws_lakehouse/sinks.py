@@ -1,17 +1,15 @@
 """S3Parquet target sink class, which handles writing streams."""
 
-
 from typing import Dict, List, Optional
 import awswrangler as wr
-from pandas import DataFrame
+from pandas import DataFrame, Timestamp
 from singer_sdk import Target
 from singer_sdk.sinks import BatchSink
-import json
-from target_s3_parquet.data_type_generator import (
+from target_aws_lakehouse.data_type_generator import (
     generate_tap_schema,
     generate_current_target_schema,
 )
-from target_s3_parquet.sanitizer import (
+from target_aws_lakehouse.sanitizer import (
     get_specific_type_attributes,
     apply_json_dump_to_df,
     stringify_df,
@@ -57,10 +55,9 @@ class S3ParquetSink(BatchSink):
         # ------
         # client.upload(context["file_path"])  # Upload file
         # Path(context["file_path"]).unlink()  # Delete local copy
-
         df = DataFrame(context["records"])
 
-        df["_sdc_started_at"] = STARTED_AT.timestamp()
+        df["_sdc_started_at"] = Timestamp(STARTED_AT)
 
         current_schema = generate_current_target_schema(self._get_glue_schema())
         tap_schema = generate_tap_schema(
@@ -79,20 +76,35 @@ class S3ParquetSink(BatchSink):
         self.logger.debug(f"DType Definition: {dtype}")
 
         full_path = f"{self.config.get('s3_path')}/{self.config.get('athena_database')}/{self.stream_name}"
+        temp_path = f"{self.config.get('s3_path')}/{self.config.get('athena_database')}_temp_path/{self.stream_name}"
 
-        wr.s3.to_parquet(
-            df=df,
-            index=False,
-            compression="gzip",
-            dataset=True,
-            path=full_path,
-            database=self.config.get("athena_database"),
-            table=self.stream_name,
-            mode="append",
-            partition_cols=["_sdc_started_at"],
-            schema_evolution=True,
-            dtype=dtype,
-        )
+        if self.config.get("table_type") == "iceberg":
+            wr.athena.to_iceberg(
+                df=df,
+                database=self.config.get("athena_database"),
+                table=self.stream_name,
+                table_location=full_path,
+                partition_cols=["_sdc_started_at"],
+                temp_path=temp_path,
+                additional_table_properties={
+                    "write_compression": self.config.get("compression").upper(),
+                    "write_target_data_file_size_bytes": "134217728",
+                },
+            )
+        else:
+            wr.s3.to_parquet(
+                df=df,
+                index=False,
+                compression=self.config.get("compression"),
+                dataset=True,
+                path=full_path,
+                database=self.config.get("athena_database"),
+                table=self.stream_name,
+                mode="append",
+                partition_cols=["_sdc_started_at"],
+                schema_evolution=True,
+                dtype=dtype,
+            )
 
         self.logger.info(f"Uploaded {len(context['records'])}")
 
