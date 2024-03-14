@@ -47,5 +47,11 @@ class TargetS3Parquet(Target):
             default="hive",
             allowed_values=["hive", "iceberg"],
         ),
+        th.Property(
+            "max_records_per_batch",
+            th.IntegerType,
+            description="The max records",
+            default=10000,
+        ),
     ).to_dict()
     default_sink_class = S3ParquetSink

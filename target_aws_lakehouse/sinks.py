@@ -47,7 +47,10 @@ class S3ParquetSink(BatchSink):
         else:
             return DataFrame()
 
-    max_size = 10000  # Max records to write in one batch
+    @property
+    def max_size(self) -> int:
+        """Return the maximum number of records to write in a single batch."""
+        return self.config.get("max_records_per_batch")
 
     def process_batch(self, context: dict) -> None:
         """Write out any prepped records and return once fully written."""
