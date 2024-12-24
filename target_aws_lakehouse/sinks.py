@@ -11,6 +11,7 @@ from target_aws_lakehouse.data_type_generator import (
 )
 from target_aws_lakehouse.sanitizer import (
     get_specific_type_attributes,
+    drop_timezone_in_timestamp_attributes,
     apply_json_dump_to_df,
     stringify_df,
 )
@@ -36,7 +37,6 @@ class S3ParquetSink(BatchSink):
         self._glue_schema = self._get_glue_schema()
 
     def _get_glue_schema(self):
-
         catalog_params = {
             "database": self.config.get("athena_database"),
             "table": self.stream_name,
@@ -68,6 +68,12 @@ class S3ParquetSink(BatchSink):
         )
 
         dtype = {**current_schema, **tap_schema}
+
+        # Drop timezone in timestamp attributes
+        timestamp_cols = list(
+            map(lambda x: x[0], filter(lambda x: x[1] == "timestamp", dtype.items()))
+        )
+        df = drop_timezone_in_timestamp_attributes(df, timestamp_cols)
 
         if self.config.get("stringify_schema"):
             attributes_names = get_specific_type_attributes(

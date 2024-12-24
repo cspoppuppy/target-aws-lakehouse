@@ -1,4 +1,4 @@
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 import numpy as np
 import json
 from typing import List
@@ -45,6 +45,15 @@ def get_valid_attributes(attributes_names: List[str], df: DataFrame) -> List:
             attribute for attribute in attributes_names if attribute in df.columns
         ]
     return valid_attributes
+
+
+def drop_timezone_in_timestamp_attributes(
+    source_df: DataFrame, timestamp_cols: List[str]
+) -> DataFrame:
+    df = source_df.copy()
+    for col in timestamp_cols:
+        df[col] = to_datetime(df[col], errors="coerce", utc=True).dt.tz_convert(None)
+    return df
 
 
 def apply_json_dump_to_df(
